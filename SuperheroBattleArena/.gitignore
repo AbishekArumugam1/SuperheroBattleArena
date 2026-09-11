@@ -1,0 +1,19 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Game save/progress
+superhero_save.json
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# IDE settings
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
