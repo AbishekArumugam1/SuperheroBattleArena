@@ -1,0 +1,13 @@
+{
+  "level": 8,
+  "hero": "SHADOW",
+  "xp": 19,
+  "coins": 0,
+  "rank": 9,
+  "upgrades": {
+    "POWER": 5,
+    "ARMOR": 5,
+    "SPEED": 5,
+    "ENERGY": 0
+  }
+}
