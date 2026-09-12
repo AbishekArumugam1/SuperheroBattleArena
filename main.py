@@ -1,4 +1,5 @@
-﻿import json
+﻿import asyncio
+import json
 import pygame
 import random
 import math
@@ -8,7 +9,7 @@ pygame.init()
 # ============================================================
 # BRAINROT BACKGROUND MUSIC
 # ============================================================
-MUSIC_FILE = "brainrot_music.mp3"
+MUSIC_FILE = "brainrot_music.ogg"
 MUSIC_ENABLED = False
 try:
     pygame.mixer.init()
@@ -2816,94 +2817,106 @@ def draw_clear_ultimate():
 # FINAL MAIN LOOP
 # ============================================================
 running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
+
+async def main():
+    global running
+
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
                 running = False
-            elif state == MENU:
-                if event.key in (pygame.K_LEFT, pygame.K_a):
-                    selected = (selected - 1) % len(HERO_NAMES)
-                elif event.key in (pygame.K_RIGHT, pygame.K_d):
-                    selected = (selected + 1) % len(HERO_NAMES)
-                elif event.key in (pygame.K_c,):
-                    if load_game():
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+                elif state == MENU:
+                    if event.key in (pygame.K_LEFT, pygame.K_a):
+                        globals()["selected"] = (selected - 1) % len(HERO_NAMES)
+                    elif event.key in (pygame.K_RIGHT, pygame.K_d):
+                        globals()["selected"] = (selected + 1) % len(HERO_NAMES)
+                    elif event.key == pygame.K_c:
+                        if load_game():
+                            reset_level()
+                            globals()["state"] = LEVEL_INTRO
+                    elif event.key in (pygame.K_RETURN, pygame.K_KP_ENTER, pygame.K_SPACE):
+                        globals()["hero_name"] = HERO_NAMES[selected]
+                        start_game()
+                elif state == LEVEL_INTRO:
+                    if event.key in (pygame.K_RETURN, pygame.K_KP_ENTER, pygame.K_SPACE):
+                        globals()["state"] = BATTLE
+                        start_battle_music()
+                elif state == BATTLE:
+                    if event.key == pygame.K_u:
+                        globals()["state"] = UPGRADE_STATE
+                    elif event.key == pygame.K_SPACE:
+                        hero_attack()
+                    elif event.key == pygame.K_e:
+                        hero_special()
+                    elif event.key == pygame.K_f:
+                        hero_dash()
+                elif state == LEVEL_CLEAR:
+                    if event.key == pygame.K_u:
+                        globals()["state"] = UPGRADE_STATE
+                    elif event.key in (pygame.K_RETURN, pygame.K_KP_ENTER, pygame.K_SPACE):
+                        if level < 8:
+                            stop_battle_music()
+                            load_level(level + 1)
+                        else:
+                            stop_battle_music()
+                            globals()["state"] = MENU
+                elif state == UPGRADE_STATE:
+                    if event.key in (pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4):
+                        buy_upgrade(int(event.unicode))
+                    elif event.key in (pygame.K_RETURN, pygame.K_KP_ENTER, pygame.K_SPACE):
+                        if level < 8:
+                            stop_battle_music()
+                            load_level(level + 1)
+                        else:
+                            stop_battle_music()
+                            globals()["state"] = MENU
+                elif state == GAME_OVER:
+                    if event.key == pygame.K_r:
                         reset_level()
-                        state = LEVEL_INTRO
-                elif event.key in (pygame.K_RETURN, pygame.K_KP_ENTER, pygame.K_SPACE):
-                    hero_name = HERO_NAMES[selected]
-                    start_game()
-            elif state == LEVEL_INTRO:
-                if event.key in (pygame.K_RETURN, pygame.K_KP_ENTER, pygame.K_SPACE):
-                    state = BATTLE
-                    start_battle_music()
-            elif state == BATTLE:
-                if event.key == pygame.K_u:
-                    state = UPGRADE_STATE
-                elif event.key == pygame.K_SPACE: hero_attack()
-                elif event.key == pygame.K_e: hero_special()
-                elif event.key == pygame.K_f: hero_dash()
-            elif state == LEVEL_CLEAR:
-                if event.key == pygame.K_u:
-                    state = UPGRADE_STATE
-                elif event.key in (pygame.K_RETURN, pygame.K_KP_ENTER, pygame.K_SPACE):
-                    if level < 8:
+                        globals()["state"] = BATTLE
+                        start_battle_music()
+                    elif event.key == pygame.K_m:
                         stop_battle_music()
-                        load_level(level + 1)
-                    else:
-                        stop_battle_music()
-                        state = MENU
-            elif state == UPGRADE_STATE:
-                if event.key in (pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4):
-                    buy_upgrade(int(event.unicode))
-                elif event.key in (pygame.K_RETURN, pygame.K_KP_ENTER, pygame.K_SPACE):
-                    if level < 8:
-                        stop_battle_music()
-                        load_level(level + 1)
-                    else:
-                        stop_battle_music()
-                        state = MENU
-            elif state == GAME_OVER:
-                if event.key == pygame.K_r:
-                    reset_level()
-                    state = BATTLE
-                    start_battle_music()
-                elif event.key == pygame.K_m:
-                    stop_battle_music()
-                    state = MENU
+                        globals()["state"] = MENU
 
-    if state == BATTLE:
-        update_battle()
-        if enemy_hp <= 0 and state == BATTLE:
-            stop_battle_music()
-            state = LEVEL_CLEAR
-            save_game()
-        elif hero_hp <= 0 and state == BATTLE:
-            stop_battle_music()
-            state = GAME_OVER
+        if state == BATTLE:
+            update_battle()
+            if enemy_hp <= 0 and state == BATTLE:
+                stop_battle_music()
+                globals()["state"] = LEVEL_CLEAR
+                save_game()
+            elif hero_hp <= 0 and state == BATTLE:
+                stop_battle_music()
+                globals()["state"] = GAME_OVER
 
-    update_effects()
+        update_effects()
 
-    if state == MENU:
-        draw_menu()
-        draw_text("C → CONTINUE SAVED CAMPAIGN", SMALL, (WIDTH // 2, 600), GOLD, True)
-    elif state == LEVEL_INTRO:
-        draw_intro()
-    elif state == BATTLE:
-        draw_battle()
-    elif state == LEVEL_CLEAR:
-        draw_clear_ultimate()
-    elif state == UPGRADE_STATE:
-        draw_upgrades()
-    elif state == GAME_OVER:
-        draw_game_over()
+        if state == MENU:
+            draw_menu()
+            draw_text("C → CONTINUE SAVED CAMPAIGN", SMALL, (WIDTH // 2, 600), GOLD, True)
+        elif state == LEVEL_INTRO:
+            draw_intro()
+        elif state == BATTLE:
+            draw_battle()
+        elif state == LEVEL_CLEAR:
+            draw_clear_ultimate()
+        elif state == UPGRADE_STATE:
+            draw_upgrades()
+        elif state == GAME_OVER:
+            draw_game_over()
 
-    draw_effects()
-    pygame.display.flip()
-    # CRITICAL: lock the game to 60 FPS so movement is smooth and not extremely fast.
-    clock.tick(FPS)
+        draw_effects()
+        pygame.display.flip()
 
-stop_battle_music()
-pygame.quit()
+        # Required by Pygbag/WebAssembly: yield to the browser every frame.
+        await asyncio.sleep(0)
+
+        # Desktop/browser frame pacing.
+        clock.tick(FPS)
+
+    stop_battle_music()
+
+asyncio.run(main())
