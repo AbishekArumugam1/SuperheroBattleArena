@@ -30,8 +30,7 @@ jobs:
 
       - name: Install Pygbag
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install pygbag==0.9.4 pygame-ce
+         python -m pip install --upgrade pip pygbag pygame-ce
 
       - name: Build web game
         run: |
