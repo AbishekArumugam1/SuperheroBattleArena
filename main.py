@@ -13,7 +13,7 @@ MUSIC_FILE = "brainrot_music.ogg"
 MUSIC_ENABLED = False
 try:
     pygame.mixer.init()
-    MUSIC_ENABLED = True
+    MUSIC_ENABLED = False
 except pygame.error:
     pass
 
