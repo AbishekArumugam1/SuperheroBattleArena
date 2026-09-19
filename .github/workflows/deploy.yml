@@ -29,11 +29,40 @@ jobs:
           python-version: "3.12"
 
       - name: Install Pygbag
-        run: python -m pip install --upgrade pip pygame-ce pygbag==0.9.3
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pygame-ce pygbag==0.9.3
 
       - name: Build web game
         run: |
-          python -m pygbag --build --ume_block 0 .
+          python -m pygbag --build --html --ume_block 0 .
+
+      - name: Remove obsolete BrowserFS reference
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          index = Path("build/web/index.html")
+
+          if index.exists():
+              text = index.read_text(encoding="utf-8")
+
+              text = text.replace(
+                  '<script src="https://pygame-web.github.io/cdn/0.9.3/browserfs.min.js"></script>',
+                  ''
+              )
+
+              text = text.replace(
+                  '<script src="https://pygame-web.github.io/cdn/0.9.3//browserfs.min.js"></script>',
+                  ''
+              )
+
+              index.write_text(text, encoding="utf-8")
+              print("BrowserFS reference removed from index.html")
+          else:
+              print("index.html not found")
+              raise SystemExit(1)
+          PY
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
