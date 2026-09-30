@@ -6,9 +6,6 @@ import math
 
 pygame.init()
 
-# ============================================================
-# BRAINROT BACKGROUND MUSIC
-# ============================================================
 MUSIC_FILE = "brainrot_music.ogg"
 MUSIC_ENABLED = False
 try:
@@ -40,9 +37,6 @@ def stop_battle_music():
             pass
     music_playing = False
 
-# ============================================================
-# WINDOW
-# ============================================================
 
 WIDTH = 1100
 HEIGHT = 650
@@ -52,19 +46,12 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("SUPERHERO BATTLE ARENA - CAMPAIGN")
 clock = pygame.time.Clock()
 
-# ============================================================
-# FONTS
-# ============================================================
 
 FONT = pygame.font.SysFont('arial', 32)
 MED = pygame.font.SysFont("arial", 22, bold=True)
 SMALL = pygame.font.SysFont("arial", 17)
 BIG = pygame.font.SysFont("arial", 45, bold=True)
 HUGE = pygame.font.SysFont("arial", 65, bold=True)
-
-# ============================================================
-# COLORS
-# ============================================================
 
 WHITE = (245, 245, 245)
 BLACK = (12, 14, 24)
@@ -79,9 +66,6 @@ ORANGE = (255, 120, 35)
 DARK = (25, 30, 48)
 GREY = (105, 115, 130)
 
-# ============================================================
-# ARENA DATA
-# ============================================================
 
 ARENAS = [
     ("TRAINING", (18, 25, 55), (10, 70, 85)),
@@ -92,9 +76,6 @@ ARENAS = [
     ("FINAL BATTLE", (80, 25, 35), (25, 8, 15)),
 ]
 
-# ============================================================
-# HERO DATA
-# ============================================================
 
 HEROES = {
 
@@ -137,9 +118,7 @@ HEROES = {
 
 HERO_NAMES = list(HEROES.keys())
 
-# ============================================================
-# LEVEL DATA
-# ============================================================
+
 
 LEVELS = [
 
@@ -224,9 +203,7 @@ LEVELS = [
     }
 ]
 
-# ============================================================
-# GAME STATES
-# ============================================================
+
 
 MENU = "MENU"
 LEVEL_INTRO = "LEVEL_INTRO"
@@ -242,9 +219,6 @@ hero_name = "THUNDER"
 
 unlocked = set()
 
-# ============================================================
-# GAME OBJECTS
-# ============================================================
 
 hero = pygame.Rect(130, 430, 60, 95)
 enemy = pygame.Rect(880, 430, 65, 95)
@@ -281,25 +255,19 @@ winner = ""
 particles = []
 damage_numbers = []
 
-# Projectiles and attack animation
+
 projectiles = []
 pickups = []
 enemy_projectiles = []
 attack_anim_timer = 0
 
-# Special effect
 special_effect_timer = 0
 special_effect_type = ""
 
-# Burn effect
 burn_timer = 0
 
-# Knockback
 enemy_knockback = 0
 
-# ============================================================
-# TEXT
-# ============================================================
 
 def draw_text(text, font, position, color=WHITE, center=False):
 
@@ -312,10 +280,6 @@ def draw_text(text, font, position, color=WHITE, center=False):
 
     screen.blit(surface, rect)
 
-
-# ============================================================
-# START / RESET LEVEL
-# ============================================================
 
 def reset_level():
 
@@ -359,7 +323,6 @@ def reset_level():
     hero = pygame.Rect(130, 430, 60, 95)
     enemy = pygame.Rect(880, 430, 65, 95)
 
-    # Guardian gets extra HP
     hero_max = hero_data["hp"] + (level - 1) * 5
 
     hero_hp = hero_max
@@ -448,10 +411,6 @@ def load_level(number):
     state = LEVEL_INTRO
 
 
-# ============================================================
-# EFFECTS
-# ============================================================
-
 def burst(x, y, color, amount=12):
 
     for _ in range(amount):
@@ -524,10 +483,6 @@ def draw_effects():
         )
 
 
-# ============================================================
-# DAMAGE
-# ============================================================
-
 def damage_enemy(amount, color=RED):
 
     global enemy_hp
@@ -559,7 +514,6 @@ def damage_player(amount):
 
     global hero_hp
 
-    # Guardian has extremely strong blocking
     if blocking:
 
         if hero_name == "GUARDIAN":
@@ -603,10 +557,6 @@ def damage_player(amount):
     )
 
 
-# ============================================================
-# COLLISION CHECK
-# ============================================================
-
 def hero_in_attack_range(extra=0):
 
     distance = abs(
@@ -637,10 +587,6 @@ def enemy_can_hit():
         and vertical
     )
 
-
-# ============================================================
-# BASIC ATTACK
-# ============================================================
 
 def spawn_projectile(kind, x, y, direction, damage, color, speed=9, size=12, lifetime=90):
     projectiles.append({
@@ -682,8 +628,6 @@ def hero_attack():
     if "COMBO" in unlocked:
         damage += min(combo - 1, 4) * 5
 
-    # Close-range hit AND a visual projectile/energy wave.
-    # The projectile makes the attack feel like a real superpower.
     if hero_name == "THUNDER":
         spawn_projectile(
             "LIGHTNING", hero.centerx + facing * 35, hero.centery - 5,
@@ -712,14 +656,8 @@ def hero_attack():
         )
         burst(hero.centerx + facing * 50, hero.centery, GREEN, 10)
 
-    # The projectile now carries the real damage.
-    # This prevents double damage at close range.
     hero_energy = min(100, hero_energy + 8)
 
-
-# ============================================================
-# UNIQUE SPECIAL ATTACK
-# ============================================================
 
 def hero_special():
 
@@ -745,10 +683,6 @@ def hero_special():
 
     special_effect_timer = 25
 
-    # ========================================================
-    # THUNDER
-    # ========================================================
-
     if hero_name == "THUNDER":
 
         special_effect_type = "THUNDER"
@@ -770,7 +704,6 @@ def hero_special():
                 CYAN
             )
 
-            # Multiple lightning strikes
             for i in range(3):
 
                 burst(
@@ -780,9 +713,6 @@ def hero_special():
                     18
                 )
 
-    # ========================================================
-    # FLAME
-    # ========================================================
 
     elif hero_name == "FLAME":
 
@@ -814,9 +744,6 @@ def hero_special():
                 45
             )
 
-    # ========================================================
-    # SHADOW
-    # ========================================================
 
     elif hero_name == "SHADOW":
 
@@ -839,7 +766,6 @@ def hero_special():
                 PURPLE
             )
 
-            # Assassin-style teleport effect
             hero.x = enemy.x - 100
 
             burst(
@@ -849,9 +775,6 @@ def hero_special():
                 50
             )
 
-    # ========================================================
-    # GUARDIAN
-    # ========================================================
 
     elif hero_name == "GUARDIAN":
 
@@ -874,7 +797,6 @@ def hero_special():
                 GREEN
             )
 
-            # Strong knockback
             enemy_knockback = 25
 
             burst(
@@ -884,10 +806,6 @@ def hero_special():
                 35
             )
 
-
-# ============================================================
-# DASH
-# ============================================================
 
 def hero_dash():
 
@@ -918,7 +836,6 @@ def hero_dash():
         min(WIDTH - 90, hero.x)
     )
 
-    # Shadow has an even faster dash
     if hero_name == "SHADOW":
 
         hero.x += direction * 45
@@ -930,18 +847,12 @@ def hero_dash():
         20
     )
 
-
-# ============================================================
-# PROJECTILES
-# ============================================================
-
 def update_projectiles():
     global burn_timer
     for shot in projectiles[:]:
         shot["x"] += shot["speed"] * shot["direction"]
         shot["life"] -= 1
 
-        # Small trail
         if random.random() < 0.8:
             burst(
                 shot["x"] - shot["direction"] * 8,
@@ -1021,10 +932,6 @@ def draw_projectiles():
         # glow ring
         pygame.draw.circle(screen, color, (x, y), r + 5, 2)
 
-
-# ============================================================
-# ENEMY PROJECTILES
-# ============================================================
 
 def spawn_enemy_projectile():
 
@@ -1108,10 +1015,6 @@ def draw_enemy_projectiles():
         pygame.draw.circle(screen, c, (x, y), r + 5, 2)
 
 
-# ============================================================
-# UPDATE BATTLE
-# ============================================================
-
 def update_battle():
 
     global vx
@@ -1145,10 +1048,6 @@ def update_battle():
 
     keys = pygame.key.get_pressed()
 
-    # ========================================================
-    # PLAYER MOVEMENT
-    # ========================================================
-
     vx = 0
 
     if keys[pygame.K_LEFT]:
@@ -1167,10 +1066,6 @@ def update_battle():
         20,
         min(WIDTH - 90, hero.x)
     )
-
-    # ========================================================
-    # JUMP
-    # ========================================================
 
     if (
         "JUMP" in unlocked
@@ -1192,9 +1087,6 @@ def update_battle():
         vy = 0
         on_ground = True
 
-    # ========================================================
-    # BLOCK
-    # ========================================================
 
     blocking = (
         keys[pygame.K_LSHIFT]
@@ -1203,10 +1095,6 @@ def update_battle():
 
     if "BLOCK" not in unlocked:
         blocking = False
-
-    # ========================================================
-    # COOLDOWNS
-    # ========================================================
 
     if attack_cd > 0:
         attack_cd -= 1
@@ -1234,10 +1122,6 @@ def update_battle():
     update_projectiles()
     update_enemy_projectiles()
 
-    # ========================================================
-    # COMBO
-    # ========================================================
-
     if combo_timer > 0:
 
         combo_timer -= 1
@@ -1246,34 +1130,21 @@ def update_battle():
 
         combo = 0
 
-    # ========================================================
-    # ENERGY
-    # ========================================================
-
     hero_energy = min(
         100,
         hero_energy + 0.08
     )
-
-    # ========================================================
-    # FLAME BURN DAMAGE
-    # ========================================================
-
+    
     if burn_timer > 0:
 
         burn_timer -= 1
 
-        # Damage every 30 frames
         if burn_timer % 30 == 0:
 
             damage_enemy(
                 3,
                 ORANGE
             )
-
-    # ========================================================
-    # ENEMY MOVEMENT
-    # ========================================================
 
     dx = hero.centerx - enemy.centerx
 
@@ -1301,18 +1172,10 @@ def update_battle():
         min(WIDTH - 90, enemy.x)
     )
 
-    # ========================================================
-    # RAGE MODE
-    # ========================================================
-
     rage = (
         level >= 7
         and enemy_hp <= enemy_max * 0.45
     )
-
-    # ========================================================
-    # ENEMY SPECIAL
-    # ========================================================
 
     if (
         rage
@@ -1322,7 +1185,6 @@ def update_battle():
 
         enemy_special_cd = 110
 
-        # Ranged enemies also launch a projectile.
         if level >= 3:
             spawn_enemy_projectile()
 
@@ -1338,10 +1200,6 @@ def update_battle():
             RED,
             25
         )
-
-    # ========================================================
-    # ENEMY BASIC ATTACK
-    # ========================================================
 
     elif (
         abs(dx) < 125
@@ -1362,8 +1220,6 @@ def update_battle():
 
             damage_player(damage)
 
-    # Ranged attack: once the enemy is far enough away, it can
-    # fire instead of simply walking toward the hero.
     if (
         level >= 3
         and abs(dx) >= 220
@@ -1371,10 +1227,6 @@ def update_battle():
     ):
         enemy_cd = 80 if not rage else 55
         spawn_enemy_projectile()
-
-    # ========================================================
-    # WIN / LOSE
-    # ========================================================
 
     if enemy_hp <= 0:
 
@@ -1386,18 +1238,12 @@ def update_battle():
         winner = "ENEMY"
         state = GAME_OVER
 
-
-# ============================================================
-# BACKGROUND
-# ============================================================
-
 def draw_background():
 
     screen.fill(
         (12, 16, 30)
     )
-
-    # Grid
+    
     for x in range(0, WIDTH, 50):
 
         pygame.draw.line(
@@ -1416,7 +1262,6 @@ def draw_background():
             (WIDTH, y)
         )
 
-    # Ground
     pygame.draw.rect(
         screen,
         (35, 40, 52),
@@ -1431,14 +1276,8 @@ def draw_background():
         3
     )
 
-
-# ============================================================
-# CHARACTER DRAWING
-# ============================================================
-
 def draw_character(rect, color, name, enemy_character=False):
 
-    # Shadow under character
     pygame.draw.ellipse(
         screen,
         (5, 5, 10),
@@ -1450,7 +1289,6 @@ def draw_character(rect, color, name, enemy_character=False):
         )
     )
 
-    # Head
     pygame.draw.circle(
         screen,
         color,
@@ -1461,7 +1299,6 @@ def draw_character(rect, color, name, enemy_character=False):
         20
     )
 
-    # Body
     pygame.draw.rect(
         screen,
         color,
@@ -1474,7 +1311,6 @@ def draw_character(rect, color, name, enemy_character=False):
         border_radius=10
     )
 
-    # Legs
     pygame.draw.line(
         screen,
         color,
@@ -1503,7 +1339,6 @@ def draw_character(rect, color, name, enemy_character=False):
         8
     )
 
-    # Eyes
     if enemy_character:
 
         pygame.draw.circle(
@@ -1548,7 +1383,6 @@ def draw_character(rect, color, name, enemy_character=False):
             3
         )
 
-    # Guardian shield
     if name == "GUARDIAN" and not enemy_character:
 
         pygame.draw.circle(
@@ -1561,8 +1395,6 @@ def draw_character(rect, color, name, enemy_character=False):
             18,
             4
         )
-
-    # Flame aura
     if name == "FLAME" and not enemy_character:
 
         pygame.draw.circle(
@@ -1573,7 +1405,6 @@ def draw_character(rect, color, name, enemy_character=False):
             2
         )
 
-    # Shadow aura
     if name == "SHADOW" and not enemy_character:
 
         pygame.draw.circle(
@@ -1584,7 +1415,6 @@ def draw_character(rect, color, name, enemy_character=False):
             2
         )
 
-    # Thunder lightning symbol
     if name == "THUNDER" and not enemy_character:
 
         points = [
@@ -1602,7 +1432,6 @@ def draw_character(rect, color, name, enemy_character=False):
             points
         )
 
-    # Attack animation: extend a glowing arm toward the target.
     if not enemy_character and attack_anim_timer > 0:
         hand_x = rect.centerx + facing * (rect.w // 2 + 28)
         hand_y = rect.y + 50
@@ -1630,11 +1459,6 @@ def draw_character(rect, color, name, enemy_character=False):
         WHITE,
         True
     )
-
-
-# ============================================================
-# HEALTH / ENERGY BAR
-# ============================================================
 
 def draw_bar(
     x,
@@ -1681,19 +1505,10 @@ def draw_bar(
         )
     )
 
-
-# ============================================================
-# SPECIAL VISUAL EFFECT
-# ============================================================
-
 def draw_special_effect():
 
     if special_effect_timer <= 0:
         return
-
-    # ========================================================
-    # THUNDER
-    # ========================================================
 
     if special_effect_type == "THUNDER":
 
@@ -1711,10 +1526,6 @@ def draw_special_effect():
                 ),
                 5
             )
-
-    # ========================================================
-    # FLAME
-    # ========================================================
 
     elif special_effect_type == "FLAME":
 
@@ -1738,10 +1549,6 @@ def draw_special_effect():
             4
         )
 
-    # ========================================================
-    # SHADOW
-    # ========================================================
-
     elif special_effect_type == "SHADOW":
 
         for r in range(20, 100, 20):
@@ -1753,10 +1560,6 @@ def draw_special_effect():
                 r,
                 3
             )
-
-    # ========================================================
-    # GUARDIAN
-    # ========================================================
 
     elif special_effect_type == "GUARDIAN":
 
@@ -1783,10 +1586,6 @@ def draw_special_effect():
         )
 
 
-# ============================================================
-# BATTLE SCREEN
-# ============================================================
-
 def draw_battle():
 
     draw_background()
@@ -1810,7 +1609,6 @@ def draw_battle():
     draw_enemy_projectiles()
     draw_special_effect()
 
-    # Hero HP
     draw_bar(
         25,
         20,
@@ -1822,7 +1620,6 @@ def draw_battle():
         hero_name + " HP"
     )
 
-    # Enemy HP
     draw_bar(
         745,
         20,
@@ -1834,7 +1631,6 @@ def draw_battle():
         info["enemy"] + " HP"
     )
 
-    # Energy
     draw_bar(
         25,
         55,
@@ -1846,7 +1642,6 @@ def draw_battle():
         "ENERGY"
     )
 
-    # Hero power
     draw_text(
         f"POWER: {HEROES[hero_name]['power']}",
         SMALL,
@@ -1854,7 +1649,6 @@ def draw_battle():
         HEROES[hero_name]["color"]
     )
 
-    # Level
     draw_text(
         f"LEVEL {level}/8",
         FONT,
@@ -1865,8 +1659,6 @@ def draw_battle():
         GOLD,
         True
     )
-
-    # Villain type
     draw_text(
         f"VILLAIN: {info['enemy']}",
         SMALL,
@@ -1874,7 +1666,6 @@ def draw_battle():
         RED
     )
 
-    # Rage
     if rage:
 
         draw_text(
@@ -1888,7 +1679,6 @@ def draw_battle():
             True
         )
 
-    # Combo
     if combo > 1:
 
         draw_text(
@@ -1902,7 +1692,6 @@ def draw_battle():
             True
         )
 
-    # Blocking
     if blocking:
 
         draw_text(
@@ -1916,7 +1705,6 @@ def draw_battle():
             True
         )
 
-    # Controls
     if level == 1:
 
         controls = (
@@ -1964,11 +1752,6 @@ def draw_battle():
         WHITE,
         True
     )
-
-
-# ============================================================
-# HERO SELECTION
-# ============================================================
 
 def draw_menu():
 
@@ -2023,7 +1806,6 @@ def draw_menu():
 
         y = 250
 
-        # Selected border
         if i == selected:
 
             pygame.draw.rect(
@@ -2149,11 +1931,6 @@ def draw_menu():
         True
     )
 
-
-# ============================================================
-# LEVEL INTRO
-# ============================================================
-
 def draw_intro():
 
     screen.fill(BLACK)
@@ -2261,11 +2038,6 @@ def draw_intro():
         True
     )
 
-
-# ============================================================
-# LEVEL CLEAR
-# ============================================================
-
 def draw_level_clear():
 
     screen.fill(BLACK)
@@ -2362,11 +2134,6 @@ def draw_level_clear():
             True
         )
 
-
-# ============================================================
-# GAME OVER
-# ============================================================
-
 def draw_game_over():
 
     screen.fill(BLACK)
@@ -2414,13 +2181,6 @@ def draw_game_over():
         GREY,
         True
     )
-
-
-
-# ============================================================
-# ULTIMATE UPGRADE LAYER
-# ============================================================
-# Extra systems are added here so the original campaign remains intact.
 
 UPGRADE_STATE = "UPGRADES"
 
@@ -2531,7 +2291,6 @@ _base_reset_level = reset_level
 def reset_level():
     global boss_phase, arena_flash, message, message_timer, hero_max, hero_hp, hero_energy
     _base_reset_level()
-    # Apply permanent upgrade bonuses every time a level starts.
     hero_max = int(HEROES[hero_name]["hp"] + upgrade_levels["ARMOR"] * 15)
     hero_hp = hero_max
     hero_energy = min(100 + upgrade_levels["ENERGY"] * 10, 200)
@@ -2540,7 +2299,6 @@ def reset_level():
     message = ""
     message_timer = 0
     setup_minions()
-    # Permanent movement upgrade.
     HEROES[hero_name]["speed"] = HEROES[hero_name].get("base_speed", HEROES[hero_name]["speed"]) + upgrade_levels["SPEED"] * 0.25
 
 
@@ -2549,7 +2307,7 @@ _base_damage_enemy = damage_enemy
 def damage_enemy(amount, color=RED):
     _base_damage_enemy(amount, color)
     award_xp(max(1, amount))
-    # Small chance to create a useful pickup during harder levels.
+
     if level >= 3 and random.random() < 0.045:
         pickups.append({"x": float(enemy.centerx), "y": float(enemy.centery), "kind": random.choice(["HP", "ENERGY", "POWER"]), "life": 600})
 
@@ -2578,7 +2336,7 @@ def nearest_minion(max_distance=145):
 _base_hero_attack = hero_attack
 
 def hero_attack():
-    # If a minion is right beside the hero, the attack can hit it.
+
     m = nearest_minion(125)
     if m is not None and abs(m["rect"].centery - hero.centery) < 90:
         global attack_cd, attack_anim_timer
@@ -2660,7 +2418,7 @@ def boss_phase_logic():
 
 def _ultimate_update_battle():
     global arena_flash, message_timer
-    # Original combat remains the core system.
+
     update_battle_original()
     if state != BATTLE:
         return
@@ -2670,9 +2428,6 @@ def _ultimate_update_battle():
         arena_flash -= 1
     if message_timer > 0:
         message_timer -= 1
-
-
-# Rename the original update function before replacing it.
 update_battle_original = update_battle
 update_battle = _ultimate_update_battle
 
@@ -2690,7 +2445,7 @@ def draw_minions():
             pygame.draw.rect(screen, c, (r.x + 12, r.y + 15, r.w - 24, 42), border_radius=7)
             pygame.draw.circle(screen, WHITE, (r.centerx - 8, r.y + 30), 4)
             pygame.draw.circle(screen, WHITE, (r.centerx + 8, r.y + 30), 4)
-        # Mini HP bar
+
         pygame.draw.rect(screen, BLACK, (r.x, r.y - 10, r.w, 6))
         pygame.draw.rect(screen, GREEN, (r.x, r.y - 10, int(r.w * m["hp"] / m["max_hp"]), 6))
 
@@ -2698,7 +2453,7 @@ def draw_minions():
 _base_draw_background = draw_background
 
 def draw_background():
-    # Arena progression: each group of levels gets a distinct atmosphere.
+   
     arena_index = min(5, (level - 1) // 2)
     _, top, bottom = ARENAS[arena_index]
     screen.fill(top)
@@ -2707,7 +2462,7 @@ def draw_background():
         pygame.draw.line(screen, (50, 55, 75), (x, 390), (x, 650), 1)
     for y in range(400, 650, 45):
         pygame.draw.line(screen, (50, 55, 75), (0, y), (WIDTH, y), 1)
-    # Skyline / arena silhouettes.
+    
     for x in range(-20, WIDTH, 90):
         h = 70 + ((x * 7 + level * 13) % 100)
         pygame.draw.rect(screen, DARK, (x, 390 - h, 70, h))
@@ -2812,10 +2567,6 @@ def draw_clear_ultimate():
         draw_text("ENTER → HERO MENU", FONT, (WIDTH // 2, 410), WHITE, True)
         draw_text("Your campaign progress has been saved.", SMALL, (WIDTH // 2, 455), GREY, True)
 
-
-# ============================================================
-# FINAL MAIN LOOP
-# ============================================================
 running = True
 
 async def main():
@@ -2911,10 +2662,8 @@ async def main():
         draw_effects()
         pygame.display.flip()
 
-        # Required by Pygbag/WebAssembly: yield to the browser every frame.
         await asyncio.sleep(0)
 
-        # Desktop/browser frame pacing.
         clock.tick(FPS)
 
     stop_battle_music()
